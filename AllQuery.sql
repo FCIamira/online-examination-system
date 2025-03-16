@@ -610,44 +610,11 @@ WHERE sa.student_id = 4 AND sa.exam_id = 18;
 
 
 
-
----ExamCorrection---
-create PROCEDURE ExamCorrection @StdID INT  ,@examid int
-AS  
-BEGIN  
-    SET NOCOUNT ON;
-
-    DECLARE @ExamResults TABLE (
-        ExamID INT,
-        TotalQuestions INT,
-        CorrectAnswers INT,
-        ScorePercentage DECIMAL(5,2)
-    );
-
-    INSERT INTO @ExamResults (ExamID, TotalQuestions, CorrectAnswers, ScorePercentage)
-    SELECT 
-        sa.exam_id AS ExamID,
-        COUNT(q.question_id) AS TotalQuestions,
-        SUM(CASE WHEN sa.answer_text = q.question_answer THEN 1 ELSE 0 END) AS CorrectAnswers,
-        CAST(SUM(CASE WHEN sa.answer_text = q.question_answer THEN 1 ELSE 0 END) * 100.0 
-             / COUNT(q.question_id) AS DECIMAL(5,2)) AS ScorePercentage
-    FROM student_answer sa
-    JOIN question q ON sa.question_id = q.question_id
-    WHERE sa.student_id = @StdID and sa.exam_id=@examID
-    GROUP BY sa.exam_id;
-
-    SELECT * FROM @ExamResults;
-END;
-
-
-EXEC ExamCorrection  @StdID = 4 ,@examid=18;
-
-
 ---GetTotalStudentScore---
 CREATE PROCEDURE GetTotalStudentScore @StdID INT  
 AS  
 BEGIN  
-    SET NOCOUNT ON;
+    
 
     DECLARE @TotalQuestions INT, @CorrectAnswers INT, @ScorePercentage DECIMAL(5,2);
 
